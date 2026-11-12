@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+
+<html lang="ru">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="theme-color" content="#111a28">
+
+<title>Инвентарь</title>
+
+<style>
+
+  :root {
+
+    --night: #0c121d; --steel: #172234; --steel-light: #26354b;
+
+    --bronze: #cf9c5c; --bronze-soft: #a77e4d; --bronze-dim: #725b3d;
+
+    --ivory: #f2e6ce; --text: #ded2bc; --muted: #a99c88;
+
+    --edge: rgba(203,157,95,.43); --edge-soft: rgba(203,157,95,.23);
+
+  }
+
+  *,*::before,*::after {box-sizing: border-box}
+
+  html {scroll-behavior:smooth}
+
+  html:has(dialog[open]) {overflow:hidden}
+
+  body {
+
+    margin:0; min-height:100vh; color:var(--ivory);
+
+    font-family: tahoma , serif;
+
+    background:
+
+      radial-gradient(ellipse at 50% -22%, rgba(92,111,139,.25), transparent 57%),
+
+      radial-gradient(ellipse at 10% 95%, rgba(154,105,53,.09), transparent 38%),
+
+      repeating-linear-gradient(115deg, transparent 0 5px, rgba(255,255,255,.006) 5px 6px),
+
+      var(--night);
+
+  }
+
+  button {font:inherit}
+
+  .shell {max-width:1120px; margin:auto; padding:38px 25px 55px}
+
+  .crest {display:flex; justify-content:center; align-items:center; gap:13px; color:var(--bronze); margin-bottom:15px}
+
+  .crest::before,.crest::after {content:""; width:83px; height:1px; background:linear-gradient(90deg,transparent,var(--edge))}
+
+  .crest::after {transform:rotate(180deg)}
+
+  .crest .symbol {border:1px solid var(--edge); border-radius:50%; height:42px; width:42px; display:grid; place-items:center; font-size:23px; box-shadow:inset 0 0 0 4px rgba(205,151,79,.06)}
+
+  header {text-align:center; margin-bottom:30px}
+
+  .eyebrow {color:var(--bronze); font: 600 10px/1.5 Georgia,serif; letter-spacing:.3em; text-transform:uppercase}
+
+  h1 {font-size:clamp(36px,5.8vw,58px); font-weight:normal; margin:8px 0 11px; letter-spacing:.015em; text-shadow:0 2px 30px #0008}
+
+  .intro {color:#c2b6a3; max-width:570px; line-height:1.65; margin:0 auto; font-size:15px}
+
+  .inset {
+
+    position:relative;
+
+    background:
+
+      linear-gradient(132deg,rgba(202,151,83,.075),transparent 35%),
+
+      linear-gradient(163deg,#202d40 0%,#141e2c 56%,#101824 100%);
+
+    border:1px solid var(--edge);
+
+    padding:29px;
+
+    box-shadow:inset 0 0 0 4px #0e1623, inset 0 0 0 5px rgba(207,155,89,.12), 0 24px 68px rgba(0,0,0,.4);
+
+  }
+
+  .inset::before,.inset::after {position:absolute; top:9px; font-size:21px; color:var(--bronze-soft); content:"✧"}
+
+  .inset::before {left:13px} .inset::after {right:13px}
+
+  .section-title {display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:16px}
+
+  h2 {margin:0; font-weight:normal; font-size:24px; color:var(--ivory)}
+
+  .micro {font-size:11px; color:var(--bronze); letter-spacing:.12em; text-transform:uppercase}
+
+  .inventory {display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px}
+
+  .slot {
+
+    border:1px solid var(--edge-soft); width:100%; min-height:184px;
+
+    display:flex; flex-direction:column; justify-content:center; align-items:center;
+
+    background:linear-gradient(155deg,rgba(227,188,119,.045),rgba(4,10,20,.22));
+
+    color:var(--ivory); padding:19px 10px 15px; cursor:pointer; position:relative;
+
+    transition:transform .2s, border-color .2s, background .2s, box-shadow .2s;
+
+  }
+
+  .slot::before {content:""; position:absolute; inset:5px; border:1px solid rgba(207,155,89,.065); pointer-events:none}
+
+  .slot:hover,.slot:focus-visible {transform:translateY(-3px); border-color:var(--bronze); background:#3440528a; box-shadow:0 10px 23px #0004; outline:none}
+
+  .item-icon {height:83px; width:90px; display:grid; place-items:center; font-size:49px; filter:grayscale(1) sepia(.75) saturate(1.5) drop-shadow(0 5px 5px #0006)}
+
+  .item-icon img {max-width:84px; max-height:81px; object-fit:contain}
+
+  .item-name {text-align:center; font-size:15px; margin-top:11px; line-height:1.3}
+
+  .item-type {margin-top:5px; font-size:10px; text-align:center; letter-spacing:.12em; text-transform:uppercase; color:var(--bronze)}
+
+  hr {border:0; border-top:1px solid var(--edge-soft); margin:33px 0 26px}
+
+  .pages {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+
+  .page-card {width:100%; min-width:0; padding:0; color:var(--ivory); background:none; border:0; text-align:left; cursor:zoom-in}
+
+  .page-frame {border:1px solid var(--edge-soft); padding:9px; background:#0d1420; transition:transform .2s,border-color .2s}
+
+  .page-card:hover .page-frame,.page-card:focus-visible .page-frame {transform:translateY(-4px);border-color:var(--bronze)}
+
+  .page-card:focus-visible {outline:2px solid var(--bronze);outline-offset:4px}
+
+  .page-frame img {display:block; width:100%; aspect-ratio:3/3.5; object-fit:cover; object-position:center 25%; background:#cfb080}
+
+  .page-title {font-size:16px; margin-top:10px; display:block}
+
+  .page-subtitle {font-size:12px; color:var(--bronze); display:block; margin-top:5px}
+
+  .foot {color:var(--bronze-soft); text-align:center; margin-top:21px; font-size:12px; letter-spacing:.1em}
+
+  dialog {border:1px solid var(--edge); color:var(--ivory); box-shadow:0 24px 100px #000c}
+
+  dialog::backdrop {background:rgba(5,8,13,.86);backdrop-filter:blur(5px)}
+
+  .detail {background:linear-gradient(140deg,#28374b,#151e2d); max-width:460px; width:calc(100vw - 32px); padding:35px 32px 27px; text-align:center}
+
+  .detail .item-icon {margin:auto; height:90px}
+
+  .detail h3 {font-weight:normal; font-size:28px; margin:12px 0}
+
+  .detail p {color:var(--text); line-height:1.7; font-size:15px; margin:0 0 7px}
+
+  .close {position:absolute;top:10px;right:12px; border:0; background:transparent; color:var(--ivory); font-size:30px; line-height:1; cursor:pointer; padding:7px}
+
+  .close:hover,.close:focus-visible {color:var(--bronze);outline:2px solid var(--edge-soft)}
+
+  .lightbox {background:rgba(7,11,19,.98);border:0; width:100vw; max-width:none; height:100dvh;max-height:none; margin:0; padding:53px 50px 29px; overflow:hidden}
+
+  .viewer-inner {display:flex; flex-direction:column; justify-content:center; align-items:center; gap:11px; height:100%; min-height:0}
+
+  .viewer-image {min-height:0; height:100%; width:100%; max-width:100%; object-fit:contain; filter:drop-shadow(0 7px 20px #000a)}
+
+  .viewer-caption {flex:0 0 auto; font-size:14px; color:var(--bronze);text-align:center}
+
+  .viewer-nav {position:absolute;top:50%;transform:translateY(-50%);font-size:38px;cursor:pointer;color:var(--bronze);background:none;border:0;padding:10px}
+
+  .viewer-nav:hover {color:var(--ivory)}
+
+  .viewer-nav.prev {left:6px} .viewer-nav.next {right:6px}
+
+  .lightbox .close {top:10px; right:20px; font-size:37px}
+
+  @media (max-width:720px) {
+
+    .shell {padding:26px 13px 35px}.inset {padding:24px 14px}
+
+    .inventory {grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+
+    .slot {min-height:158px}.pages{grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px}
+
+    .page-frame img {aspect-ratio:3/4}
+
+    .lightbox {padding:57px 31px 31px}.viewer-nav{padding:3px;font-size:32px}
+
+    .viewer-nav.prev{left:2px}.viewer-nav.next{right:2px}
+
+  }
+
+  .archive-trigger {margin-top:22px;display:flex;gap:24px;align-items:center;width:100%;border:1px solid var(--edge);background:linear-gradient(115deg,#26354a,#1b293b 50%,#121e2e);color:var(--ivory);padding:21px;cursor:pointer;text-align:left;transition:transform .22s,border-color .22s,box-shadow .22s;overflow:hidden}
+  .archive-trigger:hover,.archive-trigger:focus-visible {border-color:var(--bronze);transform:translateY(-2px);box-shadow:0 12px 30px #0005;outline:none}
+  .archive-trigger:focus-visible {outline:2px solid #e8bd7d;outline-offset:3px}
+  .archive-art {position:relative;flex:0 0 150px;height:145px;filter:drop-shadow(0 8px 10px #0008)}
+  .archive-art img {position:absolute;top:7px;left:24px;width:93px;height:132px;object-fit:cover;border:1px solid #aa854e;box-shadow:0 3px 9px #0008}
+  .archive-art img:first-child {transform:translateX(-20px) rotate(-13deg)}
+  .archive-art img:nth-child(2) {transform:translateX(13px) rotate(10deg)}
+  .archive-seal {position:absolute;bottom:2px;right:1px;background:#7c4b31;border:2px solid #c99557;color:#f1d9b2;border-radius:50%;height:44px;width:44px;display:grid;place-items:center;font-size:22px;box-shadow:0 2px 11px #0009}
+  .archive-copy {flex:1;min-width:0}
+  .archive-copy h3 {font-size:clamp(20px,3vw,28px);font-weight:normal;margin:8px 0}
+  .archive-copy p {margin:0 0 13px;font-size:14px;max-width:630px;line-height:1.65;color:#c9bba9}
+  .archive-copy .archive-open-label {font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:#f1bd77}
+  .archive-dialog {width:min(1050px,calc(100vw - 26px));max-width:none;max-height:min(94dvh,1100px);padding:0;overflow:auto;background:linear-gradient(160deg,#24334a,#131d2e 70%)}
+  .archive-header {padding:34px 34px 22px;border-bottom:1px solid var(--edge-soft);background:radial-gradient(ellipse at 80% 10%,#bf8d4321,transparent 45%)}
+  .archive-header h2 {font-size:clamp(27px,4vw,38px);margin:8px 46px 9px 0}
+  .archive-description {font-size:15px;color:#c9bda8;line-height:1.6;margin:0}
+  .archive-meta {font-size:12px;color:var(--bronze);margin-top:13px;letter-spacing:.1em}
+  .archive-body {padding:26px 34px 33px}
+  .archive-summary {border-left:3px solid #c59b64;background:#101a296e;padding:17px 21px 18px;margin-bottom:27px}
+  .archive-summary h3 {font-size:20px;font-weight:normal;color:#efcf9e;margin:0 0 12px}
+  .archive-summary p {color:#e0d5c4;font-size:15px;line-height:1.75;margin:0 0 10px}
+  .archive-summary p:last-child {margin-bottom:0}
+  .letter-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+  .letter-card {padding:0;text-align:left;color:var(--ivory);border:0;background:none;cursor:zoom-in;min-width:0}
+  .letter-card:focus-visible {outline:2px solid var(--bronze);outline-offset:4px}
+  .letter-card img {display:block;width:100%;aspect-ratio:2/3;object-fit:contain;background:#171e29;border:1px solid #d19d6163;box-shadow:0 7px 13px #0007;transition:transform .2s,border-color .2s}
+  .letter-card:hover img,.letter-card:focus-visible img {transform:translateY(-3px);border-color:#f2c98e}
+  .letter-card strong {display:block;margin-top:10px;font-size:15px;font-weight:normal}
+  .letter-card span {display:block;color:var(--bronze);font-size:12px;margin-top:4px;line-height:1.45}
+  .archive-gallery-heading {font-size:19px;font-weight:normal;margin:0 0 17px}
+  .letters-lightbox {background:rgba(7,11,19,.98);border:0;width:100vw;max-width:none;height:100dvh;max-height:none;margin:0;padding:53px 50px 29px;overflow:hidden}
+  .letters-viewer-inner {display:flex;flex-direction:column;justify-content:center;align-items:center;gap:11px;height:100%;min-height:0}
+  .letters-viewer-image {min-height:0;height:100%;width:100%;max-width:100%;object-fit:contain;filter:drop-shadow(0 7px 20px #000a)}
+  .letters-viewer-caption {flex:0 0 auto;font-size:14px;color:var(--bronze);text-align:center;line-height:1.4}
+  .letters-nav {position:absolute;top:50%;transform:translateY(-50%);font-size:38px;cursor:pointer;color:var(--bronze);background:rgba(16,26,42,.75);border:0;padding:10px}
+  .letters-nav:hover {color:var(--ivory)}
+  .letters-nav.prev {left:6px}.letters-nav.next {right:6px}
+  .letters-lightbox .close {top:10px;right:20px;font-size:37px}
+  @media(max-width:700px) {
+    .archive-trigger {gap:14px;padding:15px}.archive-art {flex-basis:97px;height:112px}
+    .archive-art img {width:64px;height:99px;left:17px;top:5px}.archive-seal {width:32px;height:32px;font-size:16px}
+    .archive-copy p {font-size:13px}.archive-header {padding:29px 17px 18px}.archive-body {padding:20px 16px 27px}
+    .letter-grid {grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+    .letters-lightbox {padding:52px 30px 24px}.letters-nav {font-size:30px;padding:8px 2px}
+    .letters-nav.prev {left:2px}.letters-nav.next {right:2px}
+  }
+  @media(max-width:420px) {.archive-art {flex-basis:80px;height:106px}.archive-art img {width:61px;height:91px}.archive-seal {right:-2px}.archive-copy h3 {font-size:20px}}
+
+</style>
+
+</head>
+
+<body>
+
+<main class="shell">
+
+  <header>
+
+    <div class="crest"><div class="symbol" aria-hidden="true">✦</div></div>
+
+    <div class="eyebrow">Room of Requirement</div>
+
+    <h1>Maggie's Chest</h1>
+
+    <p class="intro">12 драконов и еще кое-что</p>
+
+  </header>
+
+  <section class="inset" aria-label="Содержимое сундучка">
+
+    <div class="section-title"><h2>Things</h2><span class="micro" id="item-count"></span></div>
+
+    <div class="inventory" id="inventory"></div>
+
+    <hr>
+
+    <div class="section-title"><h2>Lore</h2><span class="micro">Left click for full view</span></div>
+
+    <div class="pages" id="pages"></div>
+
+    <button type="button" class="archive-trigger" id="archive-open" aria-label="Открыть переписку Хереварда и М., шесть писем">
+      <span class="archive-art" aria-hidden="true"><img src="/Переписка (1).png" alt=""><img src="/Переписка (2).png" alt=""><span class="archive-seal">✉</span></span>
+      <span class="archive-copy"><span class="eyebrow">Отдельная папка · 6 писем</span><h3>Переписка Хереварда и М.</h3><p>Шесть писем о настойчивых признаниях, отказе и опасной границе между любовью и одержимостью.</p><span class="archive-open-label">Раскрыть переписку ↗</span></span>
+    </button>
+
+
+  </section>
+
+</main>
+
+<dialog class="archive-dialog" id="archive-dialog" aria-labelledby="archive-title">
+  <button class="close" id="archive-close" type="button" aria-label="Закрыть переписку">×</button>
+  <div class="archive-header"><div class="eyebrow">Найдено где-то в подземелье</div><h2 id="archive-title">Переписка Хереварда и М.</h2><div class="archive-meta">6 ПИСЕМ &nbsp; ✦ &nbsp; 3 ОТ ХЕРЕВАРДА &nbsp; ✦ &nbsp; 3 ОТ М.</div></div>
+  <div class="archive-body">
+    <section class="archive-summary" aria-label="Краткое содержание">
+      <p>Херевард Лотт снова и снова пишет госпоже М., видя в ней близкую по духу натуру и стремясь добиться ее любви. Он рассуждает о хаосе, противопоставляет себя семье Лестрейнджей и рассказывает, как изменил руны двери Хранителей, чтобы она подчинялась его правилам.</p>
+      <p>М. не отвечает взаимностью. Сначала она с горькой иронией предлагает ему невозможное испытание со ста каменными оборотнями, а затем прямо объясняет, что любит другого, и требует прекратить письма.</p>
+      <p>Херевард воспринимает отказ как вызов. Его признания перерастают в ревность и угрозы магически привязать М. к себе. В последнем письме она называет его чувства одержимостью, отказывается становиться частью его «хаоса» и предупреждает, что обратится к руководству Хогвартса при любой попытке принуждения.</p>
+    </section>
+    <div class="letter-grid" id="letter-grid"></div>
+  </div>
+</dialog>
+<dialog class="letters-lightbox" id="letters-lightbox" aria-label="Полноэкранный просмотр письма">
+  <button class="close" id="letters-close" type="button" aria-label="Закрыть письмо">×</button>
+  <button class="letters-nav prev" id="letters-prev" type="button" aria-label="Предыдущее письмо">‹</button>
+  <div class="letters-viewer-inner"><img class="letters-viewer-image" id="letters-image" alt=""><div class="letters-viewer-caption" id="letters-caption"></div></div>
+  <button class="letters-nav next" id="letters-next" type="button" aria-label="Следующее письмо">›</button>
+</dialog>
+
+<dialog class="detail" id="detail-dialog" aria-label="Описание предмета">
+
+  <button class="close" id="detail-close" type="button" aria-label="Закрыть описание">×</button>
+
+  <div id="detail-icon"></div><div class="eyebrow" id="detail-type"></div>
+
+  <h3 id="detail-name"></h3><p id="detail-text"></p>
+
+</dialog>
+
+<dialog class="lightbox" id="lightbox" aria-label="Просмотр страниц лора">
+
+  <button class="close" id="viewer-close" type="button" aria-label="Закрыть просмотр">×</button>
+
+  <button class="viewer-nav prev" id="viewer-prev" type="button" aria-label="Предыдущая страница">‹</button>
+
+  <div class="viewer-inner"><img class="viewer-image" id="viewer-image" alt=""><div class="viewer-caption" id="viewer-caption"></div></div>
+
+  <button class="viewer-nav next" id="viewer-next" type="button" aria-label="Следующая страница">›</button>
+
+</dialog>
+
+<script>
+
+"use strict";
+
+const items = [
+
+  { name: "Зимний плащ", type: "Одежда", emoji: "️", image:"/ЗИМНИЙ ПЛАЩ.png", description: "+1 живучесть, -1 маскировка" },
+
+  { name: "Остроконечная шляпа", type: "Одежда", emoji: "", image: "/ШЛЯПА.png", description: "-1 скрытность, +1 репутация" },
+
+  { name: "Луноскоп", type: "Артефакт", emoji: "", image: "/ЛУНОСКОП.png", description: "Нерабочий прототип луноскопа" },
+
+  { name: "Памятка", type: "Свиток", emoji: "", image: "/СВИТОК.png", description: "Памятка, см. Lore" },
+
+  { name: "Квадратная шляпа", type: "Одежда", emoji: "", image: "/ШЛЯПА2.png", description: "Просто стильная шляпа" },
+
+  { name: "Странный кристалл", type: "?", emoji: "", image: "/НЕИЗВЕСТНО.png", description: "" }
+
+];
+
+const lorePages = [
+
+  { title: "Страница", subtitle: "Хроники из дома Лейстрейдж", image: "/Хроники Дома Л.png" },
+
+  { title: "Свиток", subtitle: "Памятка", image: "/Свиток2.png" },
+
+  { title: "Ноты", subtitle: "на Вавилонском?", image: "/ПианиноКлюч.png" }
+
+];
+
+function samplePage(index) {
+
+  const roman = ["I", "II", "III", "IV", "V", "VI"][index] || String(index + 1);
+
+  const lines = Array.from({length: 10}, (_, i) => `<path d="M132 ${490+i*37} Q300 ${485+i*37} 618 ${490+i*37}" fill="none" stroke="#867153" opacity=".32" stroke-width="2"/>`).join("");
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="750" height="1000" viewBox="0 0 750 1000">
+
+    <defs><linearGradient id="p" x2="1" y2="1"><stop stop-color="#f2dfb6"/><stop offset=".52" stop-color="#e0c69a"/><stop offset="1" stop-color="#c6a578"/></linearGradient></defs>
+
+    <rect width="750" height="1000" fill="url(#p)"/>
+
+    <path d="M66 68H684V932H66Z M81 83H669V917H81Z" fill="none" stroke="#785837" stroke-width="2" opacity=".6"/>
+
+    <text x="375" y="177" fill="#705034" font-family="Georgia,serif" font-size="23" text-anchor="middle" letter-spacing="7">✦ ЗАПИСИ ✦</text>
+
+    <text x="375" y="278" fill="#59412e" font-family="Georgia,serif" font-size="71" text-anchor="middle">${roman}</text>
+
+    <path d="M270 321H480" stroke="#8e6b45" stroke-width="2"/>
+
+    <text x="375" y="385" fill="#74563c" font-family="Georgia,serif" font-size="25" text-anchor="middle" font-style="italic">Здесь будет страница</text>
+
+    <text x="375" y="423" fill="#74563c" font-family="Georgia,serif" font-size="25" text-anchor="middle" font-style="italic">из истории Мэгги</text>
+
+    ${lines}
+
+    <circle cx="375" cy="867" r="30" fill="#775035"/>
+
+    <text x="375" y="878" fill="#f2dfb6" font-family="Georgia,serif" font-size="31" text-anchor="middle">✦</text>
+
+  </svg>`;
+
+  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+
+}
+
+function iconNode(item) {
+
+  const div = document.createElement("div"); div.className="item-icon";
+
+  if (item.image) {const img=document.createElement("img");img.src=item.image;img.alt="";div.append(img);}
+
+  else {div.textContent=item.emoji||"✦";}
+
+  return div;
+
+}
+
+const inventory=document.getElementById("inventory");
+
+const detail=document.getElementById("detail-dialog");
+
+document.getElementById("item-count").textContent=items.length+" items";
+
+items.forEach(item=>{
+
+  const button=document.createElement("button");button.className="slot";button.type="button";
+
+  const name=document.createElement("span");name.className="item-name";name.textContent=item.name;
+
+  const type=document.createElement("span");type.className="item-type";type.textContent=item.type;
+
+  button.append(iconNode(item),name,type);
+
+  button.addEventListener("click",()=>{
+
+    document.getElementById("detail-icon").replaceChildren(iconNode(item));
+
+    document.getElementById("detail-type").textContent=item.type;
+
+    document.getElementById("detail-name").textContent=item.name;
+
+    document.getElementById("detail-text").textContent=item.description;
+
+    detail.showModal();
+
+  });
+
+  inventory.append(button);
+
+});
+
+document.getElementById("detail-close").addEventListener("click",()=>detail.close());
+
+detail.addEventListener("click",(event)=>{if(event.target===detail)detail.close();});
+
+
+
+const pages=document.getElementById("pages"), viewer=document.getElementById("lightbox");
+
+const viewerImage=document.getElementById("viewer-image");
+
+let currentPage=0;
+
+const pageImages=lorePages.map((page,index)=>page.image||samplePage(index));
+
+function renderPage() {
+
+  const page=lorePages[currentPage];
+
+  viewerImage.src=pageImages[currentPage];viewerImage.alt=page.title;
+
+  document.getElementById("viewer-caption").textContent=`${page.title} · ${currentPage+1} / ${lorePages.length}`;
+
+}
+
+function viewPage(index){currentPage=index; renderPage();viewer.showModal();}
+
+function navigate(step){currentPage=(currentPage+step+lorePages.length)%lorePages.length;renderPage();}
+
+lorePages.forEach((page,index)=>{
+
+  const button=document.createElement("button");button.type="button";button.className="page-card";
+
+  button.setAttribute("aria-label",`Открыть: ${page.title}`);
+
+  const frame=document.createElement("div");frame.className="page-frame";
+
+  const img=document.createElement("img");img.src=pageImages[index];img.alt=page.title;img.loading="lazy";
+
+  img.addEventListener("error",()=>{img.src=samplePage(index);pageImages[index]=img.src;});
+
+  frame.append(img);
+
+  const title=document.createElement("span");title.className="page-title";title.textContent=page.title;
+
+  const subtitle=document.createElement("span");subtitle.className="page-subtitle";subtitle.textContent=page.subtitle;
+
+  button.append(frame,title,subtitle);button.addEventListener("click",()=>viewPage(index));pages.append(button);
+
+});
+
+document.getElementById("viewer-close").addEventListener("click",()=>viewer.close());
+
+document.getElementById("viewer-prev").addEventListener("click",()=>navigate(-1));
+
+document.getElementById("viewer-next").addEventListener("click",()=>navigate(1));
+
+viewer.addEventListener("click",(event)=>{if(event.target===viewer)viewer.close();});
+
+document.addEventListener("keydown",event=>{
+
+  if(!viewer.open)return;
+
+  if(event.key==="ArrowLeft"){navigate(-1);event.preventDefault();}
+
+  if(event.key==="ArrowRight"){navigate(1);event.preventDefault();}
+
+});
+
+const letterPages = [
+  {title:'Письмо I',subtitle:'Херевард → М. · Хаос и руны',image:'/Переписка (1).png'},
+  {title:'Письмо II',subtitle:'М. → Херевард · Каменные оборотни',image:'/Переписка (2).png'},
+  {title:'Письмо III',subtitle:'Херевард → М. · Просьба об ответе',image:'/Переписка (3).png'},
+  {title:'Письмо IV',subtitle:'М. → Херевард · Отказ',image:'/Переписка (4).png'},
+  {title:'Письмо V',subtitle:'Херевард → М. · Ревность и угрозы',image:'/Переписка (5).png'},
+  {title:'Письмо VI',subtitle:'М. → Херевард · Последняя точка',image:'/Переписка (6).png'}
+];
+const archiveDialog=document.getElementById('archive-dialog');
+const letterDialog=document.getElementById('letters-lightbox');
+const letterImage=document.getElementById('letters-image');
+const letterCaption=document.getElementById('letters-caption');
+let currentLetter=0;
+function renderLetter(){
+  const record=letterPages[currentLetter];
+  letterImage.src=record.image;
+  letterImage.alt=record.title+' — '+record.subtitle;
+  letterCaption.textContent=record.title+' · '+record.subtitle+' · '+(currentLetter+1)+' / '+letterPages.length;
+}
+function openLetter(index){
+  currentLetter=index;
+  renderLetter();
+  if(!letterDialog.open)letterDialog.showModal();
+}
+function moveLetter(direction){currentLetter=(currentLetter+direction+letterPages.length)%letterPages.length;renderLetter();}
+const letterGrid=document.getElementById('letter-grid');
+letterPages.forEach((letter,index)=>{
+  const button=document.createElement('button');button.className='letter-card';button.type='button';
+  button.setAttribute('aria-label','Рассмотреть '+letter.title+': '+letter.subtitle);
+  const img=document.createElement('img');img.src=letter.image;img.loading='lazy';img.alt=letter.title;
+  const title=document.createElement('strong');title.textContent=letter.title;
+  const subtitle=document.createElement('span');subtitle.textContent=letter.subtitle;
+  button.append(img,title,subtitle);
+  button.addEventListener('click',()=>openLetter(index));
+  letterGrid.append(button);
+});
+document.getElementById('archive-open').addEventListener('click',()=>archiveDialog.showModal());
+document.getElementById('archive-close').addEventListener('click',()=>archiveDialog.close());
+document.getElementById('letters-close').addEventListener('click',()=>letterDialog.close());
+document.getElementById('letters-prev').addEventListener('click',()=>moveLetter(-1));
+document.getElementById('letters-next').addEventListener('click',()=>moveLetter(1));
+[archiveDialog,letterDialog].forEach(dialog=>dialog.addEventListener('click',event=>{if(event.target===dialog)dialog.close();}));
+document.addEventListener('keydown',event=>{
+  if(!letterDialog.open)return;
+  if(event.key==='ArrowLeft'){event.preventDefault();moveLetter(-1);}
+  if(event.key==='ArrowRight'){event.preventDefault();moveLetter(1);}
+});
+
+</script>
+
+</body>
+
+</html>

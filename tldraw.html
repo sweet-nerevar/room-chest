@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Сундучок Мэгги — tldraw</title>
+<style>
+  *,*::before,*::after {box-sizing:border-box}
+  html,body {width:100%; height:100%; margin:0; overflow:hidden; background:transparent}
+  body {font-family:Georgia,"Times New Roman",serif}
+  .launch {
+    width:100%;height:100%;position:absolute;inset:0;display:flex;justify-content:center;align-items:center;
+    border:0;padding:0;margin:0;background:none;cursor:zoom-in;
+  }
+  .launch img {max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;display:block;filter:drop-shadow(0 6px 7px rgba(0,0,0,.15));transition:transform 220ms ease,filter 220ms ease}
+  .launch:hover img {transform:scale(1.035);filter:drop-shadow(0 7px 12px rgba(183,118,50,.28))}
+  .launch:focus-visible {outline:2px solid #ca9755;outline-offset:-2px}
+  .launch:focus-visible img {transform:scale(1.035)}
+  #inventory-frame {position:fixed;inset:0;width:100%;height:100%;border:0;background:#0c121d;display:none}
+  .close {display:none; position:fixed;z-index:20;top:max(16px,env(safe-area-inset-top));right:max(16px,env(safe-area-inset-right));height:44px;width:44px;
+    border:1px solid #c9975b;border-radius:50%;background:rgba(22,32,48,.94);color:#f1e2c8;font:400 28px/1 Arial,sans-serif;cursor:pointer;box-shadow:0 5px 20px #0008;backdrop-filter:blur(4px)}
+  .close:hover,.close:focus-visible {background:#334258;outline:2px solid #f0cf92;outline-offset:2px}
+  html:fullscreen,html:-webkit-full-screen {width:100vw;height:100vh;background:#09101c}
+  html:fullscreen body,html:-webkit-full-screen body {width:100vw;height:100vh}
+  html:fullscreen .launch, html:-webkit-full-screen .launch {display:none}
+  html:fullscreen #inventory-frame, html:-webkit-full-screen #inventory-frame {display:block}
+  html:fullscreen .close, html:-webkit-full-screen .close {display:grid;place-items:center}
+  /* Перенесено из старого tldraw.html дневника Мэгги: масштаб 0.42 → 1 за 670 мс. */
+  @keyframes maggie-zoom-in {
+    0% {transform:translateY(28px) scale(.42);opacity:0}
+    54% {transform:translateY(-5px) scale(1.035);opacity:1}
+    76% {transform:translateY(2px) scale(.985);opacity:1}
+    100% {transform:translateY(0) scale(1);opacity:1}
+  }
+  @keyframes maggie-room-dim {0% {background-color:rgba(10,9,9,0)}100%{background-color:#09101c}}
+  html:fullscreen, html:-webkit-full-screen {animation:maggie-room-dim 420ms ease-out both}
+  html:fullscreen #inventory-frame,html:-webkit-full-screen #inventory-frame {
+    transform-origin:center center;animation:maggie-zoom-in 670ms cubic-bezier(.18,.81,.29,1) both;will-change:transform,opacity;
+  }
+  @media (prefers-reduced-motion:reduce){html:fullscreen,html:-webkit-full-screen,html:fullscreen #inventory-frame,html:-webkit-full-screen #inventory-frame {animation:none}}
+  .fallback {display:none;position:absolute;inset:0;z-index:5;padding:16px;flex-direction:column;justify-content:center;align-items:center;gap:11px;
+    color:#f3e5d0;background:rgba(12,18,29,.96);text-align:center}
+  .fallback.show {display:flex}
+  .fallback p {max-width:320px;margin:0;font-size:14px;line-height:1.5}
+  .fallback a {font-size:13px;color:#f7dfb6;border:1px solid #a97f4c;padding:9px 14px;text-decoration:none;border-radius:24px;background:#3b312a}
+  .fallback button {border:0;background:none;color:#bcb0a0;text-decoration:underline;padding:7px;cursor:pointer;font-size:12px}
+</style>
+</head>
+<body>
+<!-- При встраивании в tldraw виден ОДИН сундук на прозрачном фоне. -->
+<button id="launch" class="launch" type="button" title="Открыть сундук Мэгги" aria-label="Открыть сундук Мэгги">
+  <img src="./chest.png" alt="Волшебный сундук Мэгги">
+</button>
+<!-- При разворачивании появляется полный инвентарь, а не повторный сундук. -->
+<iframe id="inventory-frame" src="./inventory.html" title="Инвентарь Мэгги" loading="eager" allow="fullscreen"></iframe>
+<button id="close" class="close" type="button" aria-label="Закрыть сундук" title="Закрыть">×</button>
+<div class="fallback" id="fallback" role="status" aria-live="polite">
+  <p>Встроенная страница не получила разрешение на полноэкранный просмотр.</p>
+  <a href="./inventory.html" target="_blank" rel="noopener noreferrer">Открыть инвентарь в новой вкладке ↗</a>
+  <button type="button" id="dismiss">Вернуться к сундуку</button>
+</div>
+<script>
+"use strict";
+const launch=document.getElementById("launch");
+const closeButton=document.getElementById("close");
+const fallback=document.getElementById("fallback");
+const frame=document.getElementById("inventory-frame");
+let wasFullscreen=false;
+launch.addEventListener("click",async()=>{
+  if(document.fullscreenElement)return;
+  fallback.classList.remove("show");
+  try {
+    if(!document.documentElement.requestFullscreen)throw new Error("Fullscreen API unavailable");
+    await document.documentElement.requestFullscreen();
+  } catch(error) {
+    console.warn("Fullscreen недоступен во встраивании:",error);
+    fallback.classList.add("show");
+  }
+});
+closeButton.addEventListener("click",()=>{
+  if(document.fullscreenElement)document.exitFullscreen();
+});
+document.getElementById("dismiss").addEventListener("click",()=>fallback.classList.remove("show"));
+document.addEventListener("fullscreenchange",()=>{
+  const nowFullscreen=Boolean(document.fullscreenElement);
+  if(wasFullscreen && !nowFullscreen) {frame.src="./inventory.html";launch.focus({preventScroll:true});}
+  wasFullscreen=nowFullscreen;
+});
+</script>
+</body>
+</html>
