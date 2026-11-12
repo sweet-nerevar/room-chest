@@ -275,7 +275,7 @@
     <div class="pages" id="pages"></div>
 
     <button type="button" class="archive-trigger" id="archive-open" aria-label="Открыть переписку Хереварда и М., шесть писем">
-      <span class="archive-art" aria-hidden="true"><img src="/Переписка (1).png" alt=""><img src="/Переписка (2).png" alt=""><span class="archive-seal">✉</span></span>
+      <span class="archive-art" aria-hidden="true"><img src="./Переписка (1).png" alt=""><img src="./Переписка (2).png" alt=""><span class="archive-seal">✉</span></span>
       <span class="archive-copy"><span class="eyebrow">6 писем</span><h3>Переписка Хереварда и М.</h3><p>Шесть писем о настойчивых признаниях, отказе и опасной границе между любовью и одержимостью.</p><span class="archive-open-label">Раскрыть переписку ↗</span></span>
     </button>
 
@@ -331,27 +331,27 @@
 
 const items = [
 
-  { name: "Зимний плащ", type: "Одежда", emoji: "️", image:"/ЗИМНИЙ ПЛАЩ.png", description: "+1 живучесть, -1 маскировка" },
+  { name: "Зимний плащ", type: "Одежда", emoji: "️", image:"./ЗИМНИЙ ПЛАЩ.png", description: "+1 живучесть, -1 маскировка" },
 
-  { name: "Остроконечная шляпа", type: "Одежда", emoji: "", image: "/ШЛЯПА.png", description: "-1 скрытность, +1 репутация" },
+  { name: "Остроконечная шляпа", type: "Одежда", emoji: "", image: "./ШЛЯПА.png", description: "-1 скрытность, +1 репутация" },
 
-  { name: "Луноскоп", type: "Артефакт", emoji: "", image: "/ЛУНОСКОП.png", description: "Нерабочий прототип луноскопа" },
+  { name: "Луноскоп", type: "Артефакт", emoji: "", image: "./ЛУНОСКОП.png", description: "Нерабочий прототип луноскопа" },
 
-  { name: "Памятка", type: "Свиток", emoji: "", image: "/СВИТОК.png", description: "Памятка, см. Lore" },
+  { name: "Памятка", type: "Свиток", emoji: "", image: "./СВИТОК.png", description: "Памятка, см. Lore" },
 
-  { name: "Квадратная шляпа", type: "Одежда", emoji: "", image: "/ШЛЯПА2.png", description: "Просто стильная шляпа" },
+  { name: "Квадратная шляпа", type: "Одежда", emoji: "", image: "./ШЛЯПА2.png", description: "Просто стильная шляпа" },
 
-  { name: "Странный кристалл", type: "?", emoji: "", image: "/НЕИЗВЕСТНО.png", description: "" }
+  { name: "Странный кристалл", type: "?", emoji: "", image: "./НЕИЗВЕСТНО.png", description: "" }
 
 ];
 
 const lorePages = [
 
-  { title: "Страница", subtitle: "Хроники из дома Лейстрейдж", image: "/Хроники Дома Л.png" },
+  { title: "Страница", subtitle: "Хроники из дома Лейстрейдж", image: "./Хроники Дома Л.png" },
 
-  { title: "Свиток", subtitle: "Памятка", image: "/Свиток2.png" },
+  { title: "Свиток", subtitle: "Памятка", image: "./Свиток2.png" },
 
-  { title: "Ноты", subtitle: "на Вавилонском?", image: "/ПианиноКлюч.png" }
+  { title: "Ноты", subtitle: "на Вавилонском?", image: "./ПианиноКлюч.png" }
 
 ];
 
@@ -506,12 +506,12 @@ document.addEventListener("keydown",event=>{
 });
 
 const letterPages = [
-  {title:'Письмо I',subtitle:'Херевард → М. · Хаос и руны',image:'/Переписка (1).png'},
-  {title:'Письмо II',subtitle:'М. → Херевард · Каменные оборотни',image:'/Переписка (2).png'},
-  {title:'Письмо III',subtitle:'Херевард → М. · Просьба об ответе',image:'/Переписка (3).png'},
-  {title:'Письмо IV',subtitle:'М. → Херевард · Отказ',image:'/Переписка (4).png'},
-  {title:'Письмо V',subtitle:'Херевард → М. · Ревность и угрозы',image:'/Переписка (5).png'},
-  {title:'Письмо VI',subtitle:'М. → Херевард · Последняя точка',image:'/Переписка (6).png'}
+  {title:'Письмо I',subtitle:'Херевард → М. · Хаос и руны',image:'./Переписка (1).png'},
+  {title:'Письмо II',subtitle:'М. → Херевард · Каменные оборотни',image:'./Переписка (2).png'},
+  {title:'Письмо III',subtitle:'Херевард → М. · Просьба об ответе',image:'./Переписка (3).png'},
+  {title:'Письмо IV',subtitle:'М. → Херевард · Отказ',image:'./Переписка (4).png'},
+  {title:'Письмо V',subtitle:'Херевард → М. · Ревность и угрозы',image:'./Переписка (5).png'},
+  {title:'Письмо VI',subtitle:'М. → Херевард · Последняя точка',image:'./Переписка (6).png'}
 ];
 const archiveDialog=document.getElementById('archive-dialog');
 const letterDialog=document.getElementById('letters-lightbox');
